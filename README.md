@@ -2,8 +2,8 @@
  An Automated Repertoire Method  
  Requires MatLab and the Symbolic Math Toolbox Add-On.
 # ToDo
- - Nonhomogenous recurrence equations
-      - Algorithm exists, needs to be implemented
+ - ~~Nonhomogenous recurrence equations~~ Done
+      - ~~Algorithm exists, needs to be implemented~~
  - Finding an upper limit for the precision
       - Does not exist jet, should be trivial with proof of condition, stability, and consistency
  - Eliminating non-relevant Terms

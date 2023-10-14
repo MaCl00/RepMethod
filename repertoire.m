@@ -1,4 +1,4 @@
-function solution = repertoire(func_guess, recursive_relation, precision, start_point, rec_degree, num_poly, verbose)
+function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, precision, start_point, rec_degree, num_poly, verbose)
     digits(precision);
     syms x;
     
@@ -66,9 +66,21 @@ function solution = repertoire(func_guess, recursive_relation, precision, start_
 
     % Finding a vector that minimizes the matrix of the substituted values
     matrix = substituted';
+    % Adding a column to the matrix in case of a nonhomogeneous equation
+    if nonHomogeneous ~= 0
+        nonHColumn = zeros(M, 1);
+        for i = 1:M
+            n = (sym(i)-1)/fraction_value+rec_degree;
+            nonHColumn(i) = subs(nonHomogeneous, x, n);
+        end
+        matrix = [matrix, nonHColumn];
+    end
     [~, ~, V] = svd(matrix);
     x = V(:, end);
     y = matrix * x;
+    if nonHomogeneous ~= 0
+        x = x(1:end-1);
+    end
     y3 = matrix2 * x;
     if verbose
         [~, ~, V2] = svd(matrix2);
