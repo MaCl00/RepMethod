@@ -1,11 +1,17 @@
 function solution = repertoire(func_guess, recursive_relation, precision, start_point, rec_degree, num_poly, verbose)
-    display_precision = 5;
     digits(precision);
     syms x;
     
-    num_function_values = 1+num_poly * (2+length(func_guess));
+    num_func = length(func_guess);
+    
+    % The number of required data points
+    % 1 + 2p + p*f where p is the number of polynomials and f is the number
+    % of functions
+    num_function_values = 1 + num_poly * (2 + num_func);
+
+    % Calculating function-values
     range = num2cell(start_point:start_point+num_function_values+rec_degree-1);
-    sequences = cellfun(@(j) cellfun(@(i) subs(func_guess{j}, x, sym(i)), range), num2cell(1:length(func_guess)), 'UniformOutput', false);
+    sequences = cellfun(@(j) cellfun(@(i) subs(func_guess{j}, x, sym(i)), range), num2cell(1:num_func), 'UniformOutput', false);
     N = length(sequences);
     result = cell(1, (N*N-N)/2);
     counter = 1;
@@ -39,6 +45,8 @@ function solution = repertoire(func_guess, recursive_relation, precision, start_
     function_name = [function_name, poly_name];
     sequences = [result, polynomes];
     fprintf("Finished calulating function-values\n");
+
+    % Substituting function values into the recursive equation
     matrix2 = vertcat(sequences{:})';
     N = length(sequences);
     M = length(sequences{1})-rec_degree*fraction_value;
@@ -54,7 +62,9 @@ function solution = repertoire(func_guess, recursive_relation, precision, start_
         fprintf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
     end
     fprintf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b")
-    disp("Finished calulating substitution in recursive relation");
+    disp("Finished calulating substitution in recursive equation");
+
+    % Finding a vector that minimizes the matrix of the substituted values
     matrix = substituted';
     [~, ~, V] = svd(matrix);
     x = V(:, end);
@@ -64,9 +74,9 @@ function solution = repertoire(func_guess, recursive_relation, precision, start_
         [~, ~, V2] = svd(matrix2);
         x2 = V2(:, end);
         y2 = matrix2 * x2;
-        disp("Eine wie gute Null gibt es? " + string(norm(y2, 'fro')));
-        disp("Wie gut ist die Lösung? " + string(norm(y, 'fro')));
-        disp("Wie nah ist die Lösung an der Null? " + string(norm(y3, 'fro')));
+        disp("How good is the best null? (larger values are better) " + string(norm(y2, 'fro')));
+        disp("How good is the solution? (smaller values are better) " + string(norm(y, 'fro')));
+        disp("How close is the solution to null? (larger values are better) " + string(norm(y3, 'fro')));
     end
     solution = 0;
     for i=1:length(function_name)
