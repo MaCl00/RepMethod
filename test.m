@@ -8,11 +8,11 @@ clearvars;
 % x^2*H_x.
 syms x;
 functions = {gamma(sym(x)+1), psi(sym(x)+1)- psi(sym(1))};
-precision = 50;
+precision = 100;
 start = 0;
 rec_degree = 2;
 poly_degree = 5;
-solution = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, false); 
+solution = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, true); 
 
 
 function ret = substitute(n, func_val)

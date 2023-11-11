@@ -9,10 +9,12 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
     % of functions
     num_function_values = 1 + num_poly * (2 + num_func);
 
-    % Calculating function-values
+    % ---------------------Calculating function-values---------------------
     range = num2cell(start_point:start_point+num_function_values+rec_degree-1);
+    % A matrix where enties are the input functions evaluated at the points
     sequences = cellfun(@(j) cellfun(@(i) subs(func_guess{j}, x, sym(i)), range), num2cell(1:num_func), 'UniformOutput', false);
     N = length(sequences);
+    % Adding f*g if f and g are in the input
     result = cell(1, (N*N-N)/2);
     counter = 1;
     prod_func = cell(1, (N*N-N)/2);
@@ -25,12 +27,15 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
     end
     sequences = [sequences, result];
     func_guess = [func_guess, prod_func];
+    % Calculating polynomes up to the degree "rec_degree"
     polynomes = cell(1, num_poly);
     poly_name = cell(1, num_poly);
     for j=0:num_poly-1
         polynomes{j+1} = cellfun(@(i) (sym(i)/fraction_value)^j, range);
         poly_name{j+1} = sym(x)^j;
     end
+    % Adding f*p for f is in the input and p is a polynom previous
+    % calculated
     N = length(sequences);
     result = cell(1, N*num_poly);
     counter = 1;
@@ -44,10 +49,34 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
     end
     function_name = [function_name, poly_name];
     sequences = [result, polynomes];
-    fprintf("Finished calulating function-values\n");
-
-    % Substituting function values into the recursive equation
     matrix2 = vertcat(sequences{:})';
+    fprintf("Finished calulating function-values\n");
+    
+    
+    %--------------------Checking best trivial solution--------------------
+    % Will probably change, is not relavant right now
+    fprintf("Calculating best null in input\n")
+    
+    A = matrix2;
+    [~, ~, V2] = svd(A);
+    x2 = V2(:, end);
+    y2 = A * x2;
+    n_best = norm(y2, 'fro');
+    A(:,abs(x2) == min(abs(x2))) = [];
+    while ~isempty(A)
+        [~, ~, V2] = svd(A);
+        x2 = V2(:, end);
+        y2 = A * x2;
+        n = norm(y2, 'fro');
+        if n < n_best
+            n_best = n;
+        end
+        A(:,abs(x2) == min(abs(x2))) = [];
+    end
+    fprintf("Finished calculating best null in input\n")
+    %-------Substituting function values into the recursive equation-------
+    % Currently the slowest part
+    
     N = length(sequences);
     M = length(sequences{1})-rec_degree*fraction_value;
     substituted = sym(zeros(N, M));
@@ -63,7 +92,8 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
     end
     fprintf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b")
     disp("Finished calulating substitution in recursive equation");
-
+    
+    %--------------------------------Result--------------------------------
     % Finding a vector that minimizes the matrix of the substituted values
     matrix = substituted';
     % Adding a column to the matrix in case of a nonhomogeneous equation
@@ -83,10 +113,7 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
     end
     y3 = matrix2 * x;
     if verbose
-        [~, ~, V2] = svd(matrix2);
-        x2 = V2(:, end);
-        y2 = matrix2 * x2;
-        disp("How good is the best null? (larger values are better) " + string(norm(y2, 'fro')));
+        disp("How good is the best null? (larger values are better) " + string(n_best));
         disp("How good is the solution? (smaller values are better) " + string(norm(y, 'fro')));
         disp("How close is the solution to null? (larger values are better) " + string(norm(y3, 'fro')));
     end
