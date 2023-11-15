@@ -11,5 +11,5 @@ solution = repertoire(functions, @substitute, 0, precision, start, rec_degree, p
 
 
 function ret = substitute(n, func_val)
-    ret = func_val(1) - n * func_val(2);
+    ret = func_val(:,1) - n * func_val(:,2);
 end

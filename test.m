@@ -16,5 +16,6 @@ solution = repertoire(functions, @substitute, 0, precision, start, rec_degree, p
 
 
 function ret = substitute(n, func_val)
-    ret = func_val(1) - (psi(n+1)- psi(sym(1))) / (psi(n)- psi(sym(1))) * func_val(2);
+    psi1 = psi(sym(1));
+    ret = func_val(:,1) - (psi(n+1)- psi1) / (psi(n)- psi1) * func_val(:,2);
 end

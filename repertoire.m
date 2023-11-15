@@ -30,8 +30,9 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
     % Calculating polynomes up to the degree "rec_degree"
     polynomes = cell(1, num_poly);
     poly_name = cell(1, num_poly);
+    frac_val= fraction_value();
     for j=0:num_poly-1
-        polynomes{j+1} = cellfun(@(i) (sym(i)/fraction_value)^j, range);
+        polynomes{j+1} = cellfun(@(i) (sym(i)/frac_val)^j, range);
         poly_name{j+1} = sym(x)^j;
     end
     % Adding f*p for f is in the input and p is a polynom previous
@@ -78,16 +79,21 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
     % Currently the slowest part
     
     N = length(sequences);
-    M = length(sequences{1})-rec_degree*fraction_value;
+    M = length(sequences{1})-rec_degree*frac_val;
     substituted = sym(zeros(N, M));
+    seq = sym(zeros(N, length(sequences{1})));
+    for j=1:N
+        seq(j,:) = sequences{j};
+    end
     fprintf("Calculating substitution(")
+    idx = 0:rec_degree;
     for i = 1:M
         fprintf('%5d of %5d)\n', i, M);
-        for j = 1:N
-            n = (sym(i)-1)/fraction_value+rec_degree;
-            s = recursive_relation(n, arrayfun(@(k) sequences{j}(i+(rec_degree-k)*fraction_value), 0:rec_degree));
-            substituted(j, i) = s;
-        end
+        n = (sym(i)-1)/frac_val+rec_degree;
+        % eliminate j-loop by vectorization -> don't compute psi(n) too
+        % often
+        s = recursive_relation(n, seq(:,i+(rec_degree-idx)*frac_val));
+        substituted(:, i) = s;
         fprintf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
     end
     fprintf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b")
@@ -100,7 +106,7 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
     if nonHomogeneous ~= 0
         nonHColumn = zeros(M, 1);
         for i = 1:M
-            n = (sym(i)-1)/fraction_value+rec_degree;
+            n = (sym(i)-1)/frac_val+rec_degree;
             nonHColumn(i) = subs(nonHomogeneous, x, n);
         end
         matrix = [matrix, nonHColumn];
