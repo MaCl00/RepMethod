@@ -3,7 +3,7 @@ clearvars;
 
 syms x;
 functions = {gamma(sym(x)+1), psi(sym(x)+1)- psi(sym(1))};
-precision = 200;
+precision = 300;
 start = 0;
 rec_degree = 2;
 poly_degree = 3;
