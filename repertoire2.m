@@ -1,4 +1,4 @@
-function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, precision, start_point, rec_degree, num_poly, verbose)
+function solution = repertoire2(func_guess, recursive_relation, nonHomogeneous, precision, start_point, rec_degree, num_poly, verbose)
     digits(precision);
     syms x;
     
@@ -41,14 +41,10 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
     % Calculating polynomes up to the degree "rec_degree"
     polynomes = cell(1, num_poly);
     poly_name = cell(1, num_poly);
-    if num_poly >= 1
-        polynomes{1} = cellfun(@(i) 1, range);
-        poly_name{1} = prod(sym(x)+1:sym(x));
-    end
-    for j=1:num_poly-1
+    for j=0:num_poly-1
         fprintf('%5d of %5d)\n', j+1, num_poly);
-        polynomes{j+1} = cellfun(@(i) polynomes{j}(i- start_point + 1) * (sym(i) - j + 1), range);
-        poly_name{j+1} = prod(sym(x)-j+1:sym(x));
+        polynomes{j+1} = cellfun(@(i) sym(i)^j, range);
+        poly_name{j+1} = sym(x)^j;
         fprintf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
     end
     polyMatrix = vertcat(polynomes{:});
