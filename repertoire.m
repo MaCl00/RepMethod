@@ -3,11 +3,11 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
     syms x;
     
     num_func = length(func_guess);
-    current_row = 1;
     % The number of required data points
     % 1 + 2p + p*f where p is the number of polynomials and f is the number
     % of functions
     num_substitution = 1 + num_poly * ((num_func + num_func^2) / 2 + 1);
+    disp(num_substitution);
     num_function_values = num_substitution + rec_degree;
     function_values = zeros(num_substitution-1,num_function_values);
     % ---------------------Calculating function-values---------------------
@@ -18,14 +18,27 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
     fprintf('\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b');
     disp('Finished evaluating function-guesses');
     fprintf('Calculating product-functions');
-    seqMatrix = vertcat(sequences{:});
-    function_values(1:num_func, :) = seqMatrix;
+    function_values(1:num_func, :) = vertcat(sequences{:});
     current_row = num_func + 1;
     N = length(sequences);
     % Adding f*g if f and g are in the input
-    result = (N*N-N)/2;
     counter = 1;
     prod_func = cell(1, (N*N-N)/2);
+    digits(precision);
+    c1 = zeros(1, num_func);
+    for i=1:num_func
+        c1(i)= subs(func_guess{i}, x, num_function_values);
+    end
+    disp(c1(5));
+    digits(precision * 100);
+    disp(c1(5));
+    c2 = zeros(1, num_func);
+   
+    for i=1:num_func
+        c2(i)= subs(func_guess{i}, x, num_function_values);
+    end
+    disp(c2(5));
+    c1 = c2 - c1;
     for i = 1:N
         for j = i+1:N
             function_values(current_row, :) = function_values(i, :) .* function_values(j, :);
@@ -35,7 +48,11 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
         end
     end
     func_guess = [func_guess, prod_func];
-    fprintf('\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b');
+    % fprintf('\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b');
+    for i = 1:num_func
+        fprintf('%.2e', c1(i));
+        disp("\n");
+    end
     disp('Finished calculating product-functions');
     fprintf("Calculating polynomes");
     % Calculating polynomes up to the degree "rec_degree"
