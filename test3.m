@@ -7,6 +7,7 @@ clearvars;
 % The guesses are x!, H_x, 1, x, ..., x^5 and pairwise products, such as 
 % x^2*H_x.
 syms x;
+
 functions = {2^sym(x)};
 precision = 256;
 start = 0;

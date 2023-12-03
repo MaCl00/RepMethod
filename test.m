@@ -8,7 +8,7 @@ clearvars;
 % x^2*H_x.
 syms x;
 functions = {gamma(sym(x)+1), psi(sym(x)+1)- psi(sym(1)), 2^sym(x)};
-precision = 50;
+precision = 2;
 start = 0;
 rec_degree = 2;
 poly_degree = 5;
