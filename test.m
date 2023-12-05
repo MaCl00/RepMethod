@@ -7,12 +7,12 @@ clearvars;
 % The guesses are x!, H_x, 1, x, ..., x^5 and pairwise products, such as 
 % x^2*H_x.
 syms x;
-functions = {gamma(sym(x)+1), psi(sym(x)+1)- psi(sym(1)), 2^sym(x)};
-precision = 2;
-start = 0;
+functions = {factorial(sym(x)), psi(sym(x)+1)- psi(sym(1)), 2^sym(x)};
+precision = 64;
+start = 1;
 rec_degree = 2;
 poly_degree = 5;
-solution = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, true); 
+solution = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, false, true); 
 
 
 function ret = substitute(n, func_val)
