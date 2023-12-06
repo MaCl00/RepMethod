@@ -27,10 +27,16 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
             fprintf("Checking for null in input");
         end
         A = function_values';
+        column_norms = sqrt(sum(A.^2, 1));
+        A = A ./ column_norms;
         [~, ~, V2] = svd(A);
         x2 = V2(:, end);
         y2 = A * x2;
         n_best = norm(y2, 'fro');
+        if log10(n_best) < -precision
+            disp("Found a null!");
+            disp("Consider raising the precision to at least " + num2str(ceil(-double(log10(n_best)))) + " if this is not a null.")
+        end
 
         if verbose
             fprintf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b")
