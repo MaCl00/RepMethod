@@ -31,15 +31,20 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
         A = A ./ column_norms;
         [~, ~, V2] = svd(A);
         x2 = V2(:, end);
-        y2 = A * x2;
-        n_best = norm(y2, 'fro');
-        if log10(n_best) < -precision
-            disp("Found a null!");
-            disp("Consider raising the precision to at least " + num2str(ceil(-double(log10(n_best)))) + " if this is not a null.")
-        end
+        n_best = log10(norm(A * x2, 'fro'));
+        while n_best < -precision
+            
+            [~, max_index] = max(abs(x2));
+            A(:, max_index) = [];
 
+            [~, ~, V2] = svd(A);
+            x2 = V2(:, end);
+            n_best = log10(norm(A * x2, 'fro'));
+            disp("\nFound a null! Eliminating: " + function_name(max_index));
+            disp("Consider raising the precision to at least " + num2str(ceil(-double(n_best))) + " if this is not a part of a null.");
+            function_name(max_index) = [];
+        end
         if verbose
-            fprintf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b")
             fprintf("All null eleminated\n")
         end
     end
