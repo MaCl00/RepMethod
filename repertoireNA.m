@@ -1,7 +1,7 @@
-function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, precision, start_point, rec_degree, num_poly, varargin)
-    digits(precision);
+function solution = repertoireNA(func_guess, recursive_relation, nonHomogeneous, start_point, rec_degree, num_poly, varargin)
     num_func = length(func_guess);
     syms x;
+    precision = -50;
     % The number of required data points
     % 1 + 2p + p*f where p is the number of polynomials and f is the number
     % of functions
@@ -20,7 +20,7 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
         verbose = varargin{2};
     end
     % A matrix where enties are the input functions evaluated at the points
-    [function_values, function_name] = generateGuesses(func_guess, range, num_poly, verbose);
+    [function_values, function_name] = generateGuessesNA(func_guess, range, num_poly, verbose);
     %--------------------Checking best trivial solution--------------------
     % Will probably change, is not relavant right now
     if checkNull
@@ -44,7 +44,6 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
             n_best = log10(norm(A * x2, 'fro'));
             if verbose
                 disp("Found a null! Eliminating: " + function_name(max_index));
-                disp("Consider raising the precision to at least " + num2str(ceil(-double(n_best))) + " if this is not a part of a null.");
             end
             function_name(max_index) = [];
         end
@@ -55,13 +54,13 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
     %-------Substituting function values into the recursive equation-------
     [N, M] = size(function_values);
     M = M-rec_degree;
-    substituted = sym(zeros(N, M));
+    substituted = zeros(N, M);
     if verbose
         fprintf("Calculating substitution")
     end
     idx = 1:rec_degree;
     for i = 1:M
-        n = (sym(i)-2)+rec_degree + start_point;
+        n = (i-2)+rec_degree + start_point;
         s = recursive_relation(n, function_values(:,i+(rec_degree-idx)));
         substituted(:, i) = s;
     end
@@ -77,11 +76,12 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
     if nonHomogeneous ~= 0
         nonHColumn = zeros(M, 1);
         for i = 1:M
-            n = sym(i)-1+rec_degree;
+            n = i-1+rec_degree;
             nonHColumn(i) = subs(nonHomogeneous, x, n);
         end
         matrix = [matrix, nonHColumn];
     end
+    disp(matrix)
     [~, ~, V] = svd(matrix);
     x = V(:, end);
     column_norms = sqrt(sum(matrix.^2, 1)); 
@@ -103,11 +103,10 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
         return;
     end
     x_normalized = x;  
-    [~, sortedIndices] = sort(abs(x));
+    [~, sortedIndices] = sort(abs(x), 'descend');
     disp(function_name(sortedIndices))
     selectedColumns = [];
     remainingColumns = 1:size(matrix, 2);
-    disp(norm(matrix*x));
     for i=1:size(matrix, 2)
         [~, max_index] = max(abs(x_normalized(remainingColumns)));
         most_influential_index = remainingColumns(max_index);
@@ -117,6 +116,8 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
         [~, ~, candidate_V] = svd(reduced_matrix);
         candidate_x = candidate_V(:, end);
         result = log10(norm(reduced_matrix * candidate_x, 'fro'));
+        disp(result);
+        disp(function_name(selectedColumns))
         if result < -precision/2
             break;
         end
@@ -130,9 +131,6 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
     end
     y3 = function_values' * x;
     example = 0;
-    disp(x);
-    disp(candidate_x);
-    disp(max(abs(candidate_x)));
     x = x ./ max(abs(candidate_x));
     for i=selectedColumns
         formatted_x = sprintf('%.2e', x(i));
