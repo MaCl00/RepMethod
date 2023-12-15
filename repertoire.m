@@ -22,7 +22,7 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
     % A matrix where enties are the input functions evaluated at the points
     [function_values, function_name] = generateGuesses(func_guess, range, num_poly, verbose);
     %--------------------Checking best trivial solution--------------------
-    % Will probably change, is not relavant right now
+    % Is not very efficient, recormended to be skiped
     if checkNull
         if verbose
             fprintf("Checking for null in input");
@@ -68,7 +68,7 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
     if verbose
         fprintf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b")
         disp("Finished calulating substitution in recursive equation");
-        fprintf("Calculating results");
+        fprintf("Calculating SVD");
     end
     %--------------------------------Result--------------------------------
     % Finding a vector that minimizes the matrix of the substituted values
@@ -83,63 +83,27 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
         matrix = [matrix, nonHColumn];
     end
     [~, ~, V] = svd(matrix);
+    if verbose
+        fprintf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
+        fprintf("Finished calculating SVD\nExtracting solutions\n");
+    end
     x = V(:, end);
-    column_norms = sqrt(sum(matrix.^2, 1)); 
-    [value, index] = min(column_norms);
-    if log10(value) < -precision/2
-        solution = zeros(size(matrix, 2), 1);
-        solution(index) = 1;
-        if verbose
-            fprintf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
-            disp("---------------------Results---------------------")
-            if checkNull
-                disp("How good is the best null? (larger values are better) " + sprintf('%.2e', n_best));
-            end
-            disp("How good is the solution? (smaller values are better) " + sprintf('%.2e', norm(matrix*solution, 'fro')));
-            % Non-Homogenous throws error
-            disp("How close is the solution to null? (larger values are better) " +  sprintf('%.2e', norm(function_values' * solution, 'fro')));
-            disp(function_name(index));
-        end
-        return;
-    end
-    x_normalized = x;  
-    [~, sortedIndices] = sort(abs(x));
-    disp(function_name(sortedIndices))
-    selectedColumns = [];
-    remainingColumns = 1:size(matrix, 2);
-    disp(norm(matrix*x));
-    for i=1:size(matrix, 2)
-        [~, max_index] = max(abs(x_normalized(remainingColumns)));
-        most_influential_index = remainingColumns(max_index);
-        remainingColumns(max_index) = [];
-        selectedColumns = [selectedColumns, most_influential_index];
-        reduced_matrix = matrix(:, selectedColumns);
-        [~, ~, candidate_V] = svd(reduced_matrix);
-        candidate_x = candidate_V(:, end);
-        result = log10(norm(reduced_matrix * candidate_x, 'fro'));
-        if result < -precision/2
-            break;
-        end
-    end
-    x = zeros(size(matrix, 2), 1);
-    x(selectedColumns) = candidate_x;
-    solution = x;
-    y = matrix * x;
+    disp(norm(matrix * x, "fro"));
+    solution = SolutionExtraction(matrix, x, precision, 0);
+    y = matrix * solution;
     if nonHomogeneous ~= 0
-        x = x(1:end-1);
+        solution = solution(1:end-1);
     end
-    y3 = function_values' * x;
+    y3 = function_values' * solution;
     example = 0;
-    disp(x);
-    disp(candidate_x);
-    disp(max(abs(candidate_x)));
-    x = x ./ max(abs(candidate_x));
-    for i=selectedColumns
-        formatted_x = sprintf('%.2e', x(i));
-        example = example + function_name{i} * str2double(formatted_x);
+    solution = solution ./ max(abs(solution));
+    for i=1:length(solution)
+        if solution(i) ~= 0
+            formatted_x = sprintf('%.2e', solution(i));
+            example = example + function_name{i} * str2double(formatted_x);
+        end
     end
     if verbose
-        % fprintf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b");
         disp("---------------------Results---------------------")
         if checkNull
             disp("How good is the best null? (larger values are better) " + sprintf('%.2e', n_best));

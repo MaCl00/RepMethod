@@ -9,11 +9,11 @@ clearvars;
 syms x;
 
 functions = {2^sym(x)};
-precision = 64;
+precision = 8;
 start = 0;
 rec_degree = 3;
-poly_degree = 60;
-solution = repertoireNA(functions, @substitute, 0, start, rec_degree, poly_degree, false, true); 
+poly_degree = 20;
+solution = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, false, true); 
 
 
 function ret = substitute(n, func_val)
