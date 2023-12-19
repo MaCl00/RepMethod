@@ -13,11 +13,15 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
     verbose = false;
     checkNull = false;
     nVarargs = length(varargin);
+    continue_search = true;
     if nVarargs > 0
         checkNull = varargin{1};
     end
     if nVarargs > 1
         verbose = varargin{2};
+    end
+    if nVarargs > 2
+        continue_search = varargin{3};
     end
     % A matrix where enties are the input functions evaluated at the points
     [function_values, function_name] = generateGuesses(func_guess, range, num_poly, verbose);
@@ -89,15 +93,26 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
         reduced_matrix = matrix(:,selected_columns);
         [~, ~, V] = svd(reduced_matrix);
         x = V(:, end);
+        y = log10(norm(reduced_matrix * x, "fro"));
         if verbose
-            y = log10(norm(reduced_matrix * x, "fro"));
-            if y > 0
-                disp("Seems like there is not a solution. Search will continue anyway. Expect long run-time.");
-            elseif y > -precision/2
-                disp("There might be a solution. Search will likly take longer.");
-            else
+            if y < -precision/2
                 disp("Confirmed a solution, search starts.");
+            elseif continue_search
+                if y < 0
+                    disp("Low likelihood of further solutions within the matrix. Search will continue. Expect longer run-time.");
+                else
+                    disp("No further solution expected within the matrix. Search will continue. Expect long run-time.");
+                end
+            else
+                disp("Exiting search. No further solutions expected within the matrix. If you want to continue the search anyway, set the flag continue_search to true (default value).")
             end
+            
+        end
+        if ~continue_search && y >= -precision/2
+            break;
+        end
+        if verbose
+            fprintf("Checking solution size of 1 (maximum " + size(matrix, 2) + ")");
         end
         [result, is_valid_solution] = SolutionExtraction(reduced_matrix, x, precision, 0);
         solution_vec = zeros(size(matrix, 2), 1);

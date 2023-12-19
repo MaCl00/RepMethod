@@ -7,7 +7,14 @@ clearvars;
 % The guesses are x!, H_x, 1, x, ..., x^5 and pairwise products, such as 
 % x^2*H_x.
 syms x;
-
+numIterations = 123; % Set the total number of iterations
+for i = 1:numIterations
+    % Your processing or computations here
+    fprintf('Completed %d/%d', i, numIterations);
+    pause(0.1); % Just for demonstration, replace with your actual code
+    fprintf(repmat('\b', 1, numel(['Completed %d/%d', i, numIterations])));
+end
+fprintf('Processing complete!\n');
 functions = {2^sym(x)};
 precision = 200;
 start = 0;

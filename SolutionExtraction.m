@@ -15,6 +15,9 @@ function [solution, solution_found] = SolutionExtraction(matrix, x, precision, c
             solution_found = true;
             break;
         end
+        if verbose
+            fprintf("\b\b")
+        end
     end
     solution = zeros(size(matrix, 2), 1);
     solution(selectedColumns) = candidate_x;
