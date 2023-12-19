@@ -9,11 +9,11 @@
  - ~Eliminating non-relevant Terms~
       - ~~Algorithm exists, needs to be implemented~~
       - ~Since there is no upper limit for the precision, this will be harder than expected~
- - Continuing the search after the first solution
-      - Algorithm exists, needs to be implemented
- - Determinating if there does not exist a solution
+ - ~Continuing the search after the first solution~
+      - ~Algorithm exists, needs to be implemented~
+ - ~Determinating if there does not exist a solution~
       - ~Algorithm does not exist jet, a promising idea does exist~
-      - Algorithm exists, needs to be implemented
+      - ~Algorithm exists, needs to be implemented~
  - Providing options for combinations of functions
       - Should be trivial
  - ~Adding a verbose flag for all progress-updates~
