@@ -1,8 +1,12 @@
-function [solution, solution_found] = SolutionExtraction(matrix, x, precision, checkSolution)
+function [solution, solution_found] = SolutionExtraction(matrix, x, precision, checkSolution, verbose)
     selectedColumns = [];
-    remainingColumns = 1:size(matrix, 2);
+    m = size(matrix, 2);
+    remainingColumns = 1:m;
     solution_found = false;
-    for i=1:size(matrix, 2)
+    for i=1:m
+        if verbose
+            fprintf('Completed %d/%d', i, m);
+        end
         [~, max_index] = max(abs(x(remainingColumns)));
         most_influential_index = remainingColumns(max_index);
         remainingColumns(max_index) = [];
@@ -11,18 +15,25 @@ function [solution, solution_found] = SolutionExtraction(matrix, x, precision, c
         [~, ~, candidate_V] = svd(reduced_matrix);
         candidate_x = candidate_V(:, end);
         result = log10(norm(reduced_matrix * candidate_x, 'fro'));
+        if verbose
+            fprintf(repmat('\b', 1, strlength("Completed /"+num2str(i)+num2str(m))));
+        end
         if result < -precision/2
             solution_found = true;
             break;
         end
-        if verbose
-            fprintf("\b\b")
-        end
     end
-    solution = zeros(size(matrix, 2), 1);
+    solution = zeros(m, 1);
     solution(selectedColumns) = candidate_x;
-    if (~isequal(checkSolution, 0) && size(candidate_x, 1) == size(matrix, 2)) || size(candidate_x, 1) == 1 || ~solution_found
+    if (~isequal(checkSolution, 0) && size(candidate_x, 1) == m) || size(candidate_x, 1) == 1 || ~solution_found
         return;
     end
-    [solution(selectedColumns), ~] = SolutionExtraction(reduced_matrix, candidate_x, precision, solution);
+    if verbose
+        fprintf("Searching for smaller solution");
+    end
+    [solution(selectedColumns), ~] = SolutionExtraction(reduced_matrix, candidate_x, precision, solution, verbose);
+    if verbose
+        fprintf("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b")
+        fprintf("Finished search\n");
+    end
 end

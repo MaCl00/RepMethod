@@ -1,4 +1,4 @@
-function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, precision, start_point, rec_degree, num_poly, varargin)
+function [function_name, solution] = repertoire(func_guess, recursive_relation, nonHomogeneous, precision, start_point, rec_degree, num_poly, varargin)
     digits(precision);
     num_func = length(func_guess);
     syms x;
@@ -7,6 +7,11 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
     % of functions
     num_substitution = 1 + num_poly * ((num_func + num_func^2) / 2 + 1);
     disp(num_substitution);
+    summing = false;
+    if rec_degree == -1
+        rec_degree = 2;
+        summing = true;
+    end
     num_function_values = num_substitution + rec_degree;
     % ---------------------Calculating function-values---------------------
     range = num2cell(start_point:start_point+num_function_values-1);
@@ -66,7 +71,11 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
     idx = 1:rec_degree;
     for i = 1:M
         n = (sym(i)-2)+rec_degree + start_point;
-        s = recursive_relation(n, function_values(:,i+(rec_degree-idx)));
+        if summing
+            s = recursive_relation(n, function_values(:,(i+2)-(1:(i+1))));
+        else
+            s = recursive_relation(n, function_values(:,i+(rec_degree-idx)));
+        end
         substituted(:, i) = s;
     end
     if verbose
@@ -85,7 +94,9 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
             nonHColumn(i) = subs(nonHomogeneous, x, n);
         end
         matrix = [matrix, nonHColumn];
+        function_name = [function_name, nonHomogeneous];
     end
+    hasNonH = true;
     is_valid_solution = true;
     selected_columns = 1:size(matrix, 2);
     solution = [];
@@ -111,10 +122,7 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
         if ~continue_search && y >= -precision/2
             break;
         end
-        if verbose
-            fprintf("Checking solution size of 1 (maximum " + size(matrix, 2) + ")");
-        end
-        [result, is_valid_solution] = SolutionExtraction(reduced_matrix, x, precision, 0);
+        [result, is_valid_solution] = SolutionExtraction(reduced_matrix, x, precision, 0, verbose);
         solution_vec = zeros(size(matrix, 2), 1);
         solution_vec(selected_columns) = result;
         solution = [solution, solution_vec];
@@ -136,6 +144,11 @@ function solution = repertoire(func_guess, recursive_relation, nonHomogeneous, p
         end
         if is_valid_solution
             [~, index] = max(abs(solution_vec));
+            if nonHomogeneous ~= 0 && hasNonH && ismember(length(solution_vec), selected_columns)
+                hasNonH = false;
+                index = length(solution_vec);
+                disp(function_name[index]);
+            end
             selected_columns(index) = [];
         else
             solution(:, end) = [];
