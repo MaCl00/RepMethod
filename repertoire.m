@@ -87,19 +87,20 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
     % Finding a vector that minimizes the matrix of the substituted values
     matrix = substituted';
     % Adding a column to the matrix in case of a nonhomogeneous equation
+    hasNonH = false;
+    solution = [];
     if nonHomogeneous ~= 0
+        hasNonH = true;
         nonHColumn = zeros(M, 1);
         for i = 1:M
             n = sym(i)-1+rec_degree;
             nonHColumn(i) = subs(nonHomogeneous, x, n);
         end
+        solution = [solution, zeros(size(matrix, 2), 1)];
         matrix = [matrix, nonHColumn];
-        function_name = [function_name, nonHomogeneous];
     end
-    hasNonH = true;
     is_valid_solution = true;
     selected_columns = 1:size(matrix, 2);
-    solution = [];
     while is_valid_solution
         reduced_matrix = matrix(:,selected_columns);
         [~, ~, V] = svd(reduced_matrix);
@@ -125,12 +126,24 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
         [result, is_valid_solution] = SolutionExtraction(reduced_matrix, x, precision, 0, verbose);
         solution_vec = zeros(size(matrix, 2), 1);
         solution_vec(selected_columns) = result;
-        solution = [solution, solution_vec];
-        if verbose
-            if is_valid_solution
+        if is_valid_solution
+            [max_value, index] = max(abs(solution_vec));
+            if hasNonH && solution_vec(end) ~= 0
+                hasNonH = false;
+                index = length(solution_vec);
+                solution_vec(end) = [];
+                solution(:,1) = solution_vec;
+            else
+                if hasNonH
+                    solution_vec(end) = [];
+                end
+                solution = [solution, solution_vec];
+            end
+            selected_columns(index) = [];
+            if verbose
                 disp("Calculated a solution: ");
                 example = 0;
-                solution_vec = solution_vec ./ max(abs(solution_vec));
+                solution_vec = solution_vec ./ max_value;
                 for i=1:length(solution_vec)
                     if solution_vec(i) ~= 0
                         formatted_x = sprintf('%.2e', solution_vec(i));
@@ -142,40 +155,29 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
                 disp("Found no more solution, end of search.");
             end
         end
-        if is_valid_solution
-            [~, index] = max(abs(solution_vec));
-            if nonHomogeneous ~= 0 && hasNonH && ismember(length(solution_vec), selected_columns)
-                hasNonH = false;
-                index = length(solution_vec);
-                disp(function_name[index]);
-            end
-            selected_columns(index) = [];
-        else
-            solution(:, end) = [];
-        end
     end
-    if 1 == 2
-        y = matrix * solution;
-        if nonHomogeneous ~= 0
-            solution = solution(1:end-1);
-        end
-        y3 = function_values' * solution;
-        example = 0;
-        solution = solution ./ max(abs(solution));
-        for i=1:length(solution)
-            if solution(i) ~= 0
-                formatted_x = sprintf('%.2e', solution(i));
-                example = example + function_name{i} * str2double(formatted_x);
-            end
-        end
-        if verbose
-            disp("---------------------Results---------------------")
-            if checkNull
-                disp("How good is the best null? (larger values are better) " + sprintf('%.2e', n_best));
-            end
-            disp("How good is the solution? (smaller values are better) " + sprintf('%.2e', norm(y, 'fro')));
-            disp("How close is the solution to null? (larger values are better) " +  sprintf('%.2e', norm(y3, 'fro')));
-            disp(example);
-        end
-    end
+    % if 1 == 2
+    %     y = matrix * solution;
+    %     if nonHomogeneous ~= 0
+    %         solution = solution(1:end-1);
+    %     end
+    %     y3 = function_values' * solution;
+    %     example = 0;
+    %     solution = solution ./ max(abs(solution));
+    %     for i=1:length(solution)
+    %         if solution(i) ~= 0
+    %             formatted_x = sprintf('%.2e', solution(i));
+    %             example = example + function_name{i} * str2double(formatted_x);
+    %         end
+    %     end
+    %     if verbose
+    %         disp("---------------------Results---------------------")
+    %         if checkNull
+    %             disp("How good is the best null? (larger values are better) " + sprintf('%.2e', n_best));
+    %         end
+    %         disp("How good is the solution? (smaller values are better) " + sprintf('%.2e', norm(y, 'fro')));
+    %         disp("How close is the solution to null? (larger values are better) " +  sprintf('%.2e', norm(y3, 'fro')));
+    %         disp(example);
+    %     end
+    % end
 end

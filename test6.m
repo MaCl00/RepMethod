@@ -12,8 +12,8 @@ precision = 100;
 start = 0;
 rec_degree = -1;
 poly_degree = 1;
-[function_name, solution] = repertoire(functions, @substitute, 1, precision, start, rec_degree, poly_degree, false, true, true);
-function ret = substitute(n, func_val)
-disp(size(func_val))
+[function_name, solution] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, false, true, true);
+disp(solution)
+function ret = substitute(~, func_val)
     ret = func_val(:,1) - sum(func_val(:,2:end), 2);
 end
