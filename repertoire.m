@@ -93,7 +93,6 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
         [result, is_valid_solution] = SolutionExtraction(reduced_matrix, x, precision, 0, verbose);
         solution_vec = zeros(size(matrix, 2), 1);
         solution_vec(selected_columns) = result;
-        disp(norm(function_values*solution_vec, 'fro'));
         if is_valid_solution
             [max_value, index] = max(abs(result));
             if hasNonH && result(end) ~= 0
@@ -105,6 +104,25 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
             else
                 if nonHomogeneous ~= 0
                     solution_vec(end) = [];
+                end
+                % null check
+                close_to_null = log10(norm(function_values*solution_vec, 'fro'));
+                if close_to_null < -precision/2
+                    if verbose
+                        disp("Found a linear combination that is zero in the guesses:")
+                        example = 0;
+                        solution_vec = solution_vec ./ max_value;
+                        for i=1:length(solution_vec)
+                            if solution_vec(i) ~= 0
+                                formatted_x = sprintf('%.2e', solution_vec(i));
+                                example = example + function_name{i} * str2double(formatted_x);
+                            end
+                        end
+                        disp(example);
+                        disp("Try to avoid this, run time can increase drastically.")
+                    end
+                    selected_columns(index) = [];
+                    continue;
                 end
                 solution = [solution, solution_vec];
             end
@@ -120,11 +138,19 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
                     end
                 end
                 disp(example);
-            else
-                disp("Found no more solution, end of search.");
             end
+        else
+            disp("Found no more solution, end of search.");
         end
     end
+    rows_to_keep = true(1, size(solution, 1));
+    for i=1:length(function_name)
+        if all(solution(i,:) == 0)
+            rows_to_keep(i) = false;
+        end
+    end
+    solution = solution(rows_to_keep, :);
+    function_name = function_name(rows_to_keep);
     % if 1 == 2
     %     y = matrix * solution;
     %     if nonHomogeneous ~= 0

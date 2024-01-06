@@ -1,14 +1,13 @@
 clc;
 clearvars;
-
 syms x;
-functions = {factorial(sym(x)), 3^sym(x), (-1)^sym(x), (psi(sym(x)+1)- psi(sym(1))), sym(x), sym(x)^2, sym(x)^3};
-precision = 30; 
+functions = {factorial(sym(x)), (2)^sym(x), (-1)^sym(x), (psi(sym(x)+1)- psi(sym(1)))};
+precision = 100; 
 start = 0;
-rec_degree = 3;
+rec_degree = -1;
 poly_degree = 1;
-solution = repertoire(functions, @substitute, 1, precision, start, rec_degree, poly_degree, true);
-
+[function_name, solution] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, true, true);
+disp(solution)
 function ret = substitute(~, func_val)
-    ret = func_val(:,1) - 4 * func_val(:,2) + 3 * func_val(:, 3);
+    ret = func_val(:,1) - sum(func_val(:,2:end), 2);
 end
