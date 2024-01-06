@@ -16,51 +16,16 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
     % ---------------------Calculating function-values---------------------
     range = num2cell(start_point:start_point+num_function_values-1);
     verbose = false;
-    checkNull = false;
     nVarargs = length(varargin);
     continue_search = true;
     if nVarargs > 0
-        checkNull = varargin{1};
+        verbose = varargin{1};
     end
     if nVarargs > 1
-        verbose = varargin{2};
-    end
-    if nVarargs > 2
-        continue_search = varargin{3};
+        continue_search = varargin{2};
     end
     % A matrix where enties are the input functions evaluated at the points
     [function_values, function_name] = generateGuesses(func_guess, range, num_poly, verbose);
-    %--------------------Checking best trivial solution--------------------
-    % Is not very efficient, recormended to be skiped
-    if checkNull
-        if verbose
-            fprintf("Checking for null in input");
-        end
-        A = function_values';
-        column_norms = sqrt(sum(A.^2, 1));
-        A = A ./ column_norms;
-        [~, ~, V2] = svd(A);
-        x2 = V2(:, end);
-        n_best = log10(norm(A * x2, 'fro'));
-        while n_best < -precision
-            
-            [~, max_index] = max(abs(x2));
-            A(:, max_index) = [];
-            function_values(max_index, :) = [];
-
-            [~, ~, V2] = svd(A);
-            x2 = V2(:, end);
-            n_best = log10(norm(A * x2, 'fro'));
-            if verbose
-                disp("Found a null! Eliminating: " + function_name(max_index));
-                disp("Consider raising the precision to at least " + num2str(ceil(-double(n_best))) + " if this is not a part of a null.");
-            end
-            function_name(max_index) = [];
-        end
-        if verbose
-            fprintf("All null eleminated\n")
-        end
-    end
     %-------Substituting function values into the recursive equation-------
     [N, M] = size(function_values);
     M = M-rec_degree;
@@ -89,6 +54,7 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
     % Adding a column to the matrix in case of a nonhomogeneous equation
     hasNonH = false;
     solution = [];
+    function_values = function_values';
     if nonHomogeneous ~= 0
         hasNonH = true;
         nonHColumn = zeros(M, 1);
@@ -97,6 +63,7 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
             nonHColumn(i) = subs(nonHomogeneous, x, n);
         end
         solution = [solution, zeros(size(matrix, 2), 1)];
+        function_values = [function_values, zeros(size(function_values, 1), 1)];
         matrix = [matrix, nonHColumn];
     end
     is_valid_solution = true;
@@ -126,15 +93,17 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
         [result, is_valid_solution] = SolutionExtraction(reduced_matrix, x, precision, 0, verbose);
         solution_vec = zeros(size(matrix, 2), 1);
         solution_vec(selected_columns) = result;
+        disp(norm(function_values*solution_vec, 'fro'));
         if is_valid_solution
-            [max_value, index] = max(abs(solution_vec));
-            if hasNonH && solution_vec(end) ~= 0
+            [max_value, index] = max(abs(result));
+            if hasNonH && result(end) ~= 0
                 hasNonH = false;
-                index = length(solution_vec);
+                index = length(result);
                 solution_vec(end) = [];
+                result(end) = [];
                 solution(:,1) = solution_vec;
             else
-                if hasNonH
+                if nonHomogeneous ~= 0
                     solution_vec(end) = [];
                 end
                 solution = [solution, solution_vec];

@@ -12,7 +12,7 @@ precision = 128;
 start = 1;
 rec_degree = 2;
 poly_degree = 5;
-solution = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, false, true); 
+solution = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, true); 
 
 
 function ret = substitute(n, func_val)
