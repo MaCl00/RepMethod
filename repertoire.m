@@ -121,6 +121,13 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
                         disp(example);
                         disp("Try to avoid this, run time can increase drastically.")
                     end
+                    for i=1:size(solution, 2)
+                        coef = solution(index,i);
+                        if coef ~= 0
+                            disp("!!!!!!!!!!!!!!!!!!!!!!!!!");
+                            solution(:,i) = solution(:,i) - coef/max_value * solution_vec;
+                        end
+                    end
                     selected_columns(index) = [];
                     continue;
                 end
