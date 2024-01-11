@@ -6,6 +6,9 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
     % 1 + 2p + p*f where p is the number of polynomials and f is the number
     % of functions
     num_substitution = 1 + num_poly * ((num_func + num_func^2) / 2 + 1);
+    if nonHomogeneous ~= 0
+        num_substitution = num_substitution +1;
+    end
     disp(num_substitution);
     summing = false;
     if rec_degree == -1
@@ -55,11 +58,12 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
     hasNonH = false;
     solution = [];
     function_values = function_values';
+    
     if nonHomogeneous ~= 0
         hasNonH = true;
         nonHColumn = zeros(M, 1);
         for i = 1:M
-            n = sym(i)-1+rec_degree;
+            n = sym(i)-2+rec_degree+start_point;
             nonHColumn(i) = subs(nonHomogeneous, x, n);
         end
         solution = [solution, zeros(size(matrix, 2), 1)];
@@ -124,7 +128,6 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
                     for i=1:size(solution, 2)
                         coef = solution(index,i);
                         if coef ~= 0
-                            disp("!!!!!!!!!!!!!!!!!!!!!!!!!");
                             solution(:,i) = solution(:,i) - coef/max_value * solution_vec;
                         end
                     end
