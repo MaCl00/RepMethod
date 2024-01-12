@@ -29,6 +29,14 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
     end
     % A matrix where enties are the input functions evaluated at the points
     [function_values, function_name] = generateGuesses(func_guess, range, num_poly, verbose);
+    [function_valuesModified, ~] = generateGuessesModified(func_guess, range, num_poly, verbose);
+    [function_valuesMono, ~] = generateGuessesMono(func_guess, range, num_poly, verbose);
+    disp(cond(function_values));
+    disp(function_values);
+    disp(cond(function_valuesMono));
+    disp(function_valuesMono);
+    disp(cond(function_valuesModified));
+    disp(function_valuesModified);
     %-------Substituting function values into the recursive equation-------
     [N, M] = size(function_values);
     M = M-rec_degree;
@@ -155,7 +163,7 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
     end
     rows_to_keep = true(1, size(solution, 1));
     for i=1:length(function_name)
-        if all(solution(i,:) == 0)
+        if size(solution, 2) ~= 0 && all(solution(i,:) == 0)
             rows_to_keep(i) = false;
         end
     end
