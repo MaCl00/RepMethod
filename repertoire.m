@@ -9,7 +9,6 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
     if nonHomogeneous ~= 0
         num_substitution = num_substitution +1;
     end
-    disp(num_substitution);
     summing = false;
     if rec_degree == -1
         rec_degree = 2;
@@ -26,6 +25,9 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
     end
     if nVarargs > 1
         continue_search = varargin{2};
+    end
+    if verbose
+        disp(num_substitution)
     end
     % A matrix where enties are the input functions evaluated at the points
     [function_values, function_name] = generateGuesses(func_guess, range, num_poly, verbose);
@@ -149,7 +151,7 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
                 end
                 disp(example);
             end
-        else
+        elseif verbose
             disp("Found no more solution, end of search.");
         end
     end

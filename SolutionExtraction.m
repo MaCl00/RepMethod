@@ -26,7 +26,9 @@ function [solution, solution_found] = SolutionExtraction(matrix, x, precision, c
     solution = zeros(m, 1);
     solution(selectedColumns) = candidate_x;
     if (~isequal(checkSolution, 0) && size(candidate_x, 1) == m) || size(candidate_x, 1) == 1 || ~solution_found
-        fprintf("Finished search\n");
+        if verbose
+            fprintf("Finished search\n");
+        end
         return;
     end
     [solution(selectedColumns), ~] = SolutionExtraction(reduced_matrix, candidate_x, precision, solution, verbose);
