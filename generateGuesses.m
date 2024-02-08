@@ -1,4 +1,4 @@
-function [M, function_name] = generateGuesses(func_guess, range, num_poly, verbose)
+function [M, function_name] = generateGuesses(func_guess, range, num_poly, verbose, multiply)
     syms x;
     num_func = length(func_guess);
     if verbose
@@ -8,26 +8,32 @@ function [M, function_name] = generateGuesses(func_guess, range, num_poly, verbo
     if verbose
         fprintf('\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b');
         disp('Finished evaluating function-guesses');
-        fprintf('Calculating product-functions');
+        if multiply
+            fprintf('Calculating product-functions');
+        end
     end
     M(1:num_func, :) = vertcat(sequences{:});
     current_row = num_func + 1;
     N = length(sequences);
-    % Adding f*g if f and g are in the input
-    counter = 1;
-    prod_func = cell(1, (N*N-N)/2);
-    for i = 1:N
-        for j = i+1:N
-            M(current_row, :) = M(i, :) .* M(j, :);
-            current_row = current_row + 1;
-            prod_func{counter} = func_guess{i} * func_guess{j};
-            counter = counter + 1;
+    if multiply
+        % Adding f*g if f and g are in the input
+        counter = 1;
+        prod_func = cell(1, (N*N-N)/2);
+        for i = 1:N
+            for j = i+1:N
+                M(current_row, :) = M(i, :) .* M(j, :);
+                current_row = current_row + 1;
+                prod_func{counter} = func_guess{i} * func_guess{j};
+                counter = counter + 1;
+            end
         end
+        func_guess = [func_guess, prod_func];
     end
-    func_guess = [func_guess, prod_func];
     if verbose
-        fprintf('\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b');
-        disp('Finished calculating product-functions');
+        if multiply
+            fprintf('\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b');
+            disp('Finished calculating product-functions');
+        end
         fprintf("Calculating polynomes");
     end
     % Calculating polynomes up to the degree "rec_degree"

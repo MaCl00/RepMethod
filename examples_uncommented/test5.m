@@ -1,7 +1,7 @@
 clc;
 clearvars;
 syms x;
-functions = {factorial(sym(x)), (2)^sym(x), (-1)^sym(x), (psi(sym(x)+1)- psi(sym(1)))};
+functions = {factorial(sym(x)), (2)^sym(x), (-1)^sym(x), psi(sym(x)+1)- psi(sym(1))};
 precision = 100; 
 start = 0;
 rec_degree = -1;

@@ -1,11 +1,23 @@
 function [function_name, solution] = repertoire(func_guess, recursive_relation, nonHomogeneous, precision, start_point, rec_degree, num_poly, varargin)
     digits(precision);
+    % Flags
+    verbose = any(cellfun( @(x) isequal( x, 'verbose' ), varargin ));
+    continue_search = ~any(cellfun( @(x) isequal( x, 'quitSearch' ), varargin ));
+    multiply = any(cellfun( @(x) isequal( x, 'addMul' ), varargin ));
     num_func = length(func_guess);
     syms x;
     % The number of required data points
-    % 1 + 2p + p*f where p is the number of polynomials and f is the number
-    % of functions
-    num_substitution = 1 + num_poly * ((num_func + num_func^2) / 2 + 1);
+    polyMul = num_poly;
+    if num_poly == 0
+        polyMul = 1;
+    end
+    num_substitution = 1 + polyMul * ((num_func + num_func^2) / 2 + 1);
+    if ~multiply
+        num_substitution = 1 + polyMul * (num_func + 1);
+    end
+    if num_poly == 0
+        num_substitution = num_substitution - 1;
+    end
     if nonHomogeneous ~= 0
         num_substitution = num_substitution +1;
     end
@@ -17,20 +29,8 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
     num_function_values = num_substitution + rec_degree;
     % ---------------------Calculating function-values---------------------
     range = num2cell(start_point:start_point+num_function_values-1);
-    verbose = false;
-    nVarargs = length(varargin);
-    continue_search = true;
-    if nVarargs > 0
-        verbose = varargin{1};
-    end
-    if nVarargs > 1
-        continue_search = varargin{2};
-    end
-    if verbose
-        disp(num_substitution)
-    end
     % A matrix where enties are the input functions evaluated at the points
-    [function_values, function_name] = generateGuesses(func_guess, range, num_poly, verbose);
+    [function_values, function_name] = generateGuesses(func_guess, range, num_poly, verbose, multiply);
     %-------Substituting function values into the recursive equation-------
     [N, M] = size(function_values);
     M = M-rec_degree;
@@ -69,7 +69,6 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
             nonHColumn(i) = subs(nonHomogeneous, x, n);
         end
         solution = [solution, zeros(size(matrix, 2), 1)];
-        function_values = [function_values, zeros(size(function_values, 1), 1)];
         matrix = [matrix, nonHColumn];
     end
     is_valid_solution = true;
@@ -78,7 +77,7 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
         reduced_matrix = matrix(:,selected_columns);
         [~, ~, V] = svd(reduced_matrix);
         x = V(:, end);
-        y = log10(norm(reduced_matrix * x, "fro"));
+        y = eval(log10(norm(reduced_matrix * x, "fro")));
         if verbose
             if y < -precision/2
                 disp("Confirmed a solution, search starts.");
@@ -104,6 +103,7 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
             if hasNonH && result(end) ~= 0
                 hasNonH = false;
                 index = length(result);
+                solution_vec = solution_vec./-solution_vec(end);
                 solution_vec(end) = [];
                 result(end) = [];
                 solution(:,1) = solution_vec;
@@ -157,7 +157,7 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
     end
     rows_to_keep = true(1, size(solution, 1));
     for i=1:length(function_name)
-        if all(solution(i,:) == 0)
+        if size(solution, 2)>0 && all(solution(i,:) == 0)
             rows_to_keep(i) = false;
         end
     end
