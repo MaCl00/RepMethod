@@ -6,12 +6,12 @@ start = 0;
 rec_degree = 3;
 poly_degree = 4;
 precision = 2000;
-[function_name, solution] = repertoire(functions, @substitute, sym(x)^2+sym(x)+3, precision, start, rec_degree, poly_degree, false, true);
+[function_name, solution] = repertoire(functions, @substitute, sym(x)^2+sym(x)+3, precision, start, rec_degree, poly_degree);
 for i=201:300
     precision = 10*i; 
     disp(precision);
     tic
-    [function_name, solution] = repertoire(functions, @substitute, sym(x)^2+sym(x)+3, precision, start, rec_degree, poly_degree, false, true);
+    [function_name, solution] = repertoire(functions, @substitute, sym(x)^2+sym(x)+3, precision, start, rec_degree, poly_degree);
     toc
 end
 function ret = substitute(n, func_val)

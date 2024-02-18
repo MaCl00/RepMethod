@@ -9,84 +9,84 @@ rec_degree = 3;
 poly_degree = 5;
 precision = 20;
 timestamp = datestr(now, 'yyyy_mm_dd-HH_MM_SS');
-[name, solution] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, false, true);
+[name, solution] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree);
 fid = fopen(['timings_', timestamp, '.txt'], 'w');
 for i=starting:ending
     precision = i; 
     disp(size(solution));
     disp(i);
     tic
-    [function_name, solution] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, false, true);
+    [function_name, solution] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree);
     elapsedTime = toc;
     fprintf(fid, '%d\t%f\n', precision, elapsedTime);
 end
 fclose(fid); % Close the file
 poly_degree = 10;
 timestamp = datestr(now, 'yyyy_mm_dd-HH_MM_SS');
-[~, ~] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, false, true);
+[~, ~] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree);
 fid = fopen(['timings_', timestamp, '.txt'], 'w');
 for i=starting:ending
     precision = i; 
     disp(size(solution));
     disp(i);
     tic
-    [function_name, solution] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, false, true);
+    [function_name, solution] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree);
     elapsedTime = toc;
     fprintf(fid, '%d\t%f\n', precision, elapsedTime);
 end
 fclose(fid); % Close the file
 poly_degree = 15;
 timestamp = datestr(now, 'yyyy_mm_dd-HH_MM_SS');
-[~, ~] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, false, true);
+[~, ~] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree);
 fid = fopen(['timings_', timestamp, '.txt'], 'w');
 for i=starting:ending
     precision = i; 
     disp(size(solution));
     disp(i);
     tic
-    [function_name, solution] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, false, true);
+    [function_name, solution] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree);
     elapsedTime = toc;
     fprintf(fid, '%d\t%f\n', precision, elapsedTime);
 end
 fclose(fid); % Close the file
 poly_degree = 5;
 timestamp = datestr(now, 'yyyy_mm_dd-HH_MM_SS');
-[~, ~] = repertoire(functions, @substitute2, -(sym(x)-1)^4+4*(sym(x)-1)^2+5*sym(x)-3, precision, start, rec_degree, poly_degree, false, true);
+[~, ~] = repertoire(functions, @substitute2, -(sym(x)-1)^4+4*(sym(x)-1)^2+5*sym(x)-3, precision, start, rec_degree, poly_degree);
 fid = fopen(['timings_', timestamp, '.txt'], 'w');
 for i=starting:ending
     precision = i; 
     disp(size(solution));
     disp(i);
     tic
-    [function_name, solution] = repertoire(functions, @substitute2, -(sym(x)-1)^4+4*(sym(x)-1)^2+5*sym(x)-3, precision, start, rec_degree, poly_degree, false, true);
+    [function_name, solution] = repertoire(functions, @substitute2, -(sym(x)-1)^4+4*(sym(x)-1)^2+5*sym(x)-3, precision, start, rec_degree, poly_degree);
     elapsedTime = toc;
     fprintf(fid, '%d\t%f\n', precision, elapsedTime);
 end
 fclose(fid); % Close the file
 poly_degree = 10;
 timestamp = datestr(now, 'yyyy_mm_dd-HH_MM_SS');
-[~, ~] = repertoire(functions, @substitute2, -(sym(x)-1)^4+4*(sym(x)-1)^2+5*sym(x)-3, precision, start, rec_degree, poly_degree, false, true);
+[~, ~] = repertoire(functions, @substitute2, -(sym(x)-1)^4+4*(sym(x)-1)^2+5*sym(x)-3, precision, start, rec_degree, poly_degree);
 fid = fopen(['timings_', timestamp, '.txt'], 'w');
 for i=starting:ending
     precision = i; 
     disp(size(solution));
     disp(i);
     tic
-    [function_name, solution] = repertoire(functions, @substitute2, -(sym(x)-1)^4+4*(sym(x)-1)^2+5*sym(x)-3, precision, start, rec_degree, poly_degree, false, true);
+    [function_name, solution] = repertoire(functions, @substitute2, -(sym(x)-1)^4+4*(sym(x)-1)^2+5*sym(x)-3, precision, start, rec_degree, poly_degree);
     elapsedTime = toc;
     fprintf(fid, '%d\t%f\n', precision, elapsedTime);
 end
 fclose(fid); % Close the file
 poly_degree = 15;
 timestamp = datestr(now, 'yyyy_mm_dd-HH_MM_SS');
-[~, ~] = repertoire(functions, @substitute2, -(sym(x)-1)^4+4*(sym(x)-1)^2+5*sym(x)-3, precision, start, rec_degree, poly_degree, false, true);
+[~, ~] = repertoire(functions, @substitute2, -(sym(x)-1)^4+4*(sym(x)-1)^2+5*sym(x)-3, precision, start, rec_degree, poly_degree);
 fid = fopen(['timings_', timestamp, '.txt'], 'w');
 for i=starting:ending
     precision = i; 
     disp(size(solution));
     disp(i);
     tic
-    [function_name, solution] = repertoire(functions, @substitute2, -(sym(x)-1)^4+4*(sym(x)-1)^2+5*sym(x)-3, precision, start, rec_degree, poly_degree, false, true);
+    [function_name, solution] = repertoire(functions, @substitute2, -(sym(x)-1)^4+4*(sym(x)-1)^2+5*sym(x)-3, precision, start, rec_degree, poly_degree);
     elapsedTime = toc;
     fprintf(fid, '%d\t%f\n', precision, elapsedTime);
 end

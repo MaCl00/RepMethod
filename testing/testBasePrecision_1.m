@@ -2,21 +2,21 @@ clc;
 clearvars;
 syms x;
 functions = {};
-starting = 758;
-ending = 820;
+starting = 800;
+ending = 1200;
 start = 0;
 rec_degree = 3;
 poly_degree = 15;
 precision = 3;
 timestamp = datestr(now, 'yyyy_mm_dd-HH_MM_SS');
-[~, solution] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, false, true);
+[~, solution] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree);
 fid = fopen(['timings_', timestamp, '.txt'], 'w');
 for i=starting:ending
     precision = i; 
     disp(size(solution));
     disp(i);
     tic
-    [function_name, solution] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, false, true);
+    [function_name, solution] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree);
     elapsedTime = toc;
     fprintf(fid, '%d\t%f\n', precision, elapsedTime);
 end
@@ -24,14 +24,14 @@ fclose(fid); % Close the file
 if 1==2
 poly_degree = 10;
 timestamp = datestr(now, 'yyyy_mm_dd-HH_MM_SS');
-[~, ~] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, false, true);
+[~, ~] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree);
 fid = fopen(['timings_', timestamp, '.txt'], 'w');
 for i=starting:ending
     precision = i; 
     disp(size(solution));
     disp(i);
     tic
-    [function_name, solution] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, false, true);
+    [function_name, solution] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree);
     elapsedTime = toc;
     fprintf(fid, '%d\t%f\n', precision, elapsedTime);
 end
@@ -39,7 +39,7 @@ fclose(fid); % Close the file
 precision = 10;
 poly_degree = 15;
 timestamp = datestr(now, 'yyyy_mm_dd-HH_MM_SS');
-[a, b] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, false, true);
+[a, b] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree);
 disp(a);
 disp(b);
 fid = fopen(['timings_', timestamp, '.txt'], 'w');
@@ -48,7 +48,7 @@ for i=starting:ending
     disp(size(solution));
     disp(i);
     tic
-    [function_name, solution] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, false, true);
+    [function_name, solution] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree);
     elapsedTime = toc;
     fprintf(fid, '%d\t%f\n', precision, elapsedTime);
 end

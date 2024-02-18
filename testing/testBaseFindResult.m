@@ -46,7 +46,7 @@ for h=1:6
             while ~solved
                 precision = precision + 1;
                 disp([h, j,k,precision]);
-                [function_name, solution] = repertoire(functions, rec_eq, homogeneous, precision, start, rec_degree, poly_degree, false, false);
+                [function_name, solution] = repertoire(functions, rec_eq, homogeneous, precision, start, rec_degree, poly_degree, "quitSearch");
                 solved = size(solution, 2) == num_s;
                 if size(solution, 1) == 0
                     solved = false;

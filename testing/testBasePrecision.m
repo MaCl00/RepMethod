@@ -8,7 +8,7 @@ poly_degree = 5;
 precision = 20;
 
 
-for j=1:1
+for j=2:2
     homogeneous = 0;
     if j==1
         rec_eq = @substitute;
@@ -18,16 +18,16 @@ for j=1:1
         rec_eq = @substitute3;
         homogeneous = -(sym(x)-1)^4+4*(sym(x)-1)^2+5*sym(x)-3;
     end
-    for k=2:2
-        precision = 250*k;
+    for k=1:1
+        num_poly = 5*k;
         timestamp = datestr(now, 'yyyy_mm_dd-HH_MM_SS');
         fid = fopen(['timings_', timestamp, '.txt'], 'w');
-        for i=58:72
+        for i=800:1200
             [name, solution] = repertoire(functions, @substitute, 0, 10, start, rec_degree, 2);
-            poly_degree = i; 
+            precision = i; 
             disp([j,k,i]);
             tic
-            [function_name, solution] = repertoire(functions, rec_eq, homogeneous, precision, start, rec_degree, poly_degree);
+            [function_name, solution] = repertoire(functions, rec_eq, homogeneous, precision, start, rec_degree, poly_degree, "mono");
             elapsedTime = toc;
             fprintf(fid, '%d\t%f\n', precision, elapsedTime);
             disp(size(solution));

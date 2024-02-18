@@ -4,6 +4,7 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
     verbose = any(cellfun( @(x) isequal( x, 'verbose' ), varargin ));
     continue_search = ~any(cellfun( @(x) isequal( x, 'quitSearch' ), varargin ));
     multiply = any(cellfun( @(x) isequal( x, 'addMul' ), varargin ));
+    mono = any(cellfun( @(x) isequal( x, 'mono' ), varargin ));
     num_func = length(func_guess);
     syms x;
     % The number of required data points
@@ -30,7 +31,11 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
     % ---------------------Calculating function-values---------------------
     range = num2cell(start_point:start_point+num_function_values-1);
     % A matrix where enties are the input functions evaluated at the points
-    [function_values, function_name] = generateGuesses(func_guess, range, num_poly, verbose, multiply);
+    if mono
+        [function_values, function_name] = generateGuessesMono(func_guess, range, num_poly, verbose, multiply);
+    else
+        [function_values, function_name] = generateGuesses(func_guess, range, num_poly, verbose, multiply);
+    end
     %-------Substituting function values into the recursive equation-------
     [N, M] = size(function_values);
     M = M-rec_degree;
@@ -88,7 +93,7 @@ function [function_name, solution] = repertoire(func_guess, recursive_relation, 
                     disp("No further solution expected within the matrix. Search will continue. Expect long run-time.");
                 end
             else
-                disp("Exiting search. No further solutions expected within the matrix. If you want to continue the search anyway, set the flag continue_search to true (default value).")
+                disp("Exiting search. No further solutions expected within the matrix. If you want to continue the search anyway, remove the flag 'quitSearch'.")
             end
             
         end

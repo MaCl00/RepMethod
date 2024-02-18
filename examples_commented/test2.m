@@ -11,7 +11,7 @@ precision = 200;
 start = 0;
 rec_degree = 3;
 poly_degree = 3;
-[func_name, solutions] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, true, false); 
+[func_name, solutions] = repertoire(functions, @substitute, 0, precision, start, rec_degree, poly_degree, "verbose", "quitSearch", "addMul"); 
 % solutions has for each solution a vector with the coefficients
 % func_name has the corresponding functions
 disp(solutions)
